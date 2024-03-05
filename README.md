@@ -1,1 +1,1 @@
-Just a random function that I use to design speakers
+Just a correction of functions that I use for design speakers.
