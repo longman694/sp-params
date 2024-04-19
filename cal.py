@@ -1,10 +1,18 @@
+import sys
+
+from termcolor import colored
 from collections import OrderedDict
+from unit_converter.converter import convert
 from sympy import *
 from sympy.abc import a,b,c,d,i,j,k,p,q,r,x,y,z,A,D,V,I,W,R,L,C
 
 init_printing()
 
 THDN = symbols('THDN')
+SOUND_SPEED = 343
+print(f'The speed of sound set to {colored(SOUND_SPEED, "green")} m/s\n'
+      f'use {colored("set_sound_speed()", attrs=["bold"])} to change the value.')
+
 
 equations = OrderedDict([
     ('D_cycle_sq', 2*sqrt(a*b/pi)),
@@ -13,6 +21,12 @@ equations = OrderedDict([
     ('D_oblong', 1.55*(pi*b*b/4+a*b+b*b)**0.625/(pi*b+2*a-2*b)**0.25),
     ('SINAD', 20*log(1/THDN, 10)),
 ])
+
+
+def set_sound_speed(speed):
+    global SOUND_SPEED
+    SOUND_SPEED = speed
+    print(f"Set speed of sound to {SOUND_SPEED} m/s")
 
 
 def cal_dim(vol):
@@ -33,13 +47,47 @@ def cal_dim(vol):
         print('{:13s}: {:0.2f} {:0.2f} {:0.2f}'.format(r[3], r[0]*unit, r[1]*unit, r[2]*unit))
     
 
+
+def format_length(meter):
+    if meter >= 1000:
+        return f'{meter/1000:.3f} km'
+    elif 1 > meter >= 0.01:
+        return f'{meter*100:.3f} cm'
+    elif meter < 0.01:
+        return f'{meter*1000:.3f} mm'
+    return f'{meter:.3f} m'
+
+
+def cal_wave_length(frequency):
+    """return wave length in meter"""
+    wave_length = SOUND_SPEED / frequency
+    print(f'  λ = {format_length(wave_length)}')
+    print(f'λ/2 = {format_length(wave_length/2)}')
+    print(f'λ/4 = {format_length(wave_length/4)}')
+    return wave_length
+
+
 def adjust_spl_port_area(port_area, speaker_area):
+    """Add this value to the port SPL (distract if this value is negative)"""
     return 10 * log(port_area/speaker_area, 10).evalf()
 
 
 def adjust_spl_port_dia(port_dia, speaker_dia):
+    """Add this value to the port SPL (distract if this value is negative)"""
     return 20 * log(port_dia/speaker_dia, 10).evalf()
     
+
+def cal_freq_from_len(length):
+    return SOUND_SPEED/length
+
+
+def cal_freq_from_half_len(half_len):
+    return SOUND_SPEED/half_len*2
+
+
+def cal_freq_from_quater_len(quater_len):
+    return SOUND_SPEED/half_len*4
+
 
 def cal_sinad(thdn_perc):
     """Calculate SINAD from THD+N in percent"""
