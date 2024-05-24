@@ -7,7 +7,7 @@ from sympy.printing import pprint
 
 init_printing()
 
-f3, fb, fs, Vas, Vb, Qtc, Qts, Qes, Qms = symbols('f3 fb fs Vas Vb Qtc Qts Qes Qms')
+f3, fb, fc, fs, Vas, Vb, Qtc, Qts, Qes, Qms = symbols('f3 fb fc fs Vas Vb Qtc Qts Qes Qms')
 
 THDN = symbols('THDN')
 SOUND_SPEED = 343
@@ -15,12 +15,16 @@ print(f'The speed of sound set to {colored(SOUND_SPEED, "green")} m/s\n'
       f'use {colored("set_sound_speed()", attrs=["bold"])} to change the value.')
 
 
-equations = OrderedDict([
-    ('D_cycle_sq', 2*sqrt(a*b/pi)),
-    ('D_hydralic', 2*a*b/(a+b)),     
-    ('D_ashrae', 1.3*(a*b)**0.625/(a+b)**0.25),
-    ('D_oblong', 1.55*(pi*b*b/4+a*b+b*b)**0.625/(pi*b+2*a-2*b)**0.25),
-    ('SINAD', 20*log(1/THDN, 10)),
+port_eqs = OrderedDict([
+    ('D_cycle_sq', Eq(D, 2*sqrt(a*b/pi))),
+    ('D_hydralic', Eq(D, 2*a*b/(a+b))),     
+    ('D_ashrae', Eq(D, 1.3*(a*b)**0.625/(a+b)**0.25)),
+    ('D_oblong', Eq(D, 1.55*(pi*b*b/4+a*b+b*b)**0.625/(pi*b+2*a-2*b)**0.25)),
+])
+
+filter_eqs = OrderedDict([
+    ('RC 1st order high pass filter', Eq(fc, 1/(2*pi*R*C))),
+    ('LC 2nd order high pass filter', Eq(fc, 1/(2*pi*sqrt(L*C)))),
 ])
 
 sealed_box_eqs = [
@@ -33,6 +37,12 @@ sealed_box_eqs = [
 
 
 def print_eqs(eqs):
+    if isinstance(eqs, OrderedDict):
+        for name, eq in eqs.items():
+            print(f'----[{name}]-----')
+            pprint(eq)
+            print('\n\n')
+        return
     for i, eq in enumerate(eqs):
         print(f'-----[{i+1}]-----')
         pprint(eq)
@@ -98,11 +108,11 @@ def cal_freq_from_len(length):
 
 
 def cal_freq_from_half_len(half_len):
-    return SOUND_SPEED/half_len*2
+    return SOUND_SPEED/half_len/2
 
 
 def cal_freq_from_quater_len(quater_len):
-    return SOUND_SPEED/quater_len*4
+    return SOUND_SPEED/quater_len/4
 
 
 def cal_sinad(thdn_perc):
