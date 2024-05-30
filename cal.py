@@ -30,8 +30,8 @@ filter_eqs = OrderedDict([
 sealed_box_eqs = [
     Eq(Vb, Vas / ((Qtc/Qts)**2 - 1)),
     Eq(fb, fs * ( Vas/(Vb+1) )**0.5),
-    Eq(fb, fs * ( Vas / sqrt(Vas/((Qtc/Qts)**2 - 1)+1) )),
-    Eq(fb, fs * ( Vb * sqrt((Qtc/Qts)**2 - 1) / (Vb+1))),
+    Eq(fb, fs * ( sqrt(Vas) / sqrt(Vas/((Qtc/Qts)**2 - 1)+1) )),
+    Eq(fb, fs * sqrt( Vb * ((Qtc/Qts)**2 - 1) / (Vb+1))),
     Eq(f3, fb / 2**0.5 * sqrt((1/Qtc**2 - 2) + sqrt((1/Qtc**2-2)**2 + 4))),
 ]
 
