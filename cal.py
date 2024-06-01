@@ -111,8 +111,8 @@ def cal_freq_from_half_len(half_len):
     return SOUND_SPEED/half_len/2
 
 
-def cal_freq_from_quater_len(quater_len):
-    return SOUND_SPEED/quater_len/4
+def cal_freq_from_quarter_len(quarter_len):
+    return SOUND_SPEED/quarter_len/4
 
 
 def cal_sinad(thdn_perc):
