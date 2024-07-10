@@ -1,3 +1,5 @@
+import numpy as np
+
 from termcolor import colored
 from collections import OrderedDict
 from unit_converter.converter import convert
