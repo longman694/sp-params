@@ -13,8 +13,11 @@ f3, fb, fc, fs, Vas, Vb, Qtc, Qts, Qes, Qms = symbols('f3 fb fc fs Vas Vb Qtc Qt
 
 THDN = symbols('THDN')
 SOUND_SPEED = 343
+AIR_DENSITY = 1.18  # 1.225
 print(f'The speed of sound set to {colored(SOUND_SPEED, "green")} m/s\n'
-      f'use {colored("set_sound_speed()", attrs=["bold"])} to change the value.')
+      f'The air density set to {colored(AIR_DENSITY, "green")} kg/m^3\n'
+      f'use {colored("set_sound_speed()", attrs=["bold"])} and {colored("set_air_density()", attrs=["bold"])} '
+      'to change the value.')
 
 
 port_eqs = OrderedDict([
@@ -31,7 +34,7 @@ filter_eqs = OrderedDict([
 
 sealed_box_eqs = [
     Eq(Vb, Vas / ((Qtc/Qts)**2 - 1)),
-    Eq(fb, fs * ( Vas/(Vb+1) )**0.5),
+    Eq(fb, fs * Qtc / Qts),
     Eq(fb, fs * ( sqrt(Vas) / sqrt(Vas/((Qtc/Qts)**2 - 1)+1) )),
     Eq(fb, fs * sqrt( Vb * ((Qtc/Qts)**2 - 1) / (Vb+1))),
     Eq(f3, fb / 2**0.5 * sqrt((1/Qtc**2 - 2) + sqrt((1/Qtc**2-2)**2 + 4))),
@@ -55,6 +58,12 @@ def set_sound_speed(speed):
     global SOUND_SPEED
     SOUND_SPEED = speed
     print(f"Set speed of sound to {SOUND_SPEED} m/s")
+
+
+def set_air_density(d):
+    global AIR_DENSITY
+    AIR_DENSITY = d
+    print(f"Set air density to {AIR_DENSITY} kg/m^3")
 
 
 def cal_dim(vol):
@@ -121,7 +130,21 @@ def cal_sinad(thdn_perc):
     """Calculate SINAD from THD+N in percent"""
     return 20 * log(100/thdn_perc, 10)
 
+
 def cal_thdn(sinad):
     """Calculate THD+N in percent from SINAD"""
     return 100/(10**(sinad/20))
 
+
+# def cal_spl_sd_xmax(xmax, sd, freq):
+#     """xmax in mm, Sd in cm^2"""
+#     sd = sd * 0.0001
+#     return 20 * log(xmax * sd * freq * freq * 2 * SOUND_SPEED * AIR_DENSITY / pi, 10).evalf()
+
+
+def cal_spl_sd_xmax(xmax, sd, freq):
+    """xmax in mm, Sd in cm^2"""
+    xmax = xmax * 0.001
+    sd = sd * 0.0001
+    vd = sd * xmax
+    return 112 + 10 * log(4 * pi**3 * AIR_DENSITY / SOUND_SPEED * vd**2 * freq**4, 10).evalf()
