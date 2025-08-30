@@ -45,9 +45,9 @@ sealed_box_eqs = [
 ]
 
 ported_box_eqs = OrderedDict([
-    ('Fb (Dv)', Eq(fb, c/2/pi * sqrt( pi*Dv*Dv/4*Np / Vb / (Lv + k*Dv) )))
-    ('Fb (A)', Eq(fb, c/2/pi * sqrt(A*Np / Vb / (Lv + k*(sqrt(4/pi*A))) )))
-    ('Lv (Dv)', Eq(10*c*c/16/pi * Dv*Dv*Np/Vb/fb/fb - k*Dv))
+    ('Fb (Dv)', Eq(fb, c/2/pi * sqrt( pi*Dv*Dv/4*Np / Vb / (Lv + k*Dv) ))),
+    ('Fb (A)', Eq(fb, c/2/pi * sqrt(A*Np / Vb / (Lv + k*(sqrt(4/pi*A))) ))),
+    ('Lv (Dv)', Eq(Lv, 10*c*c/16/pi * Dv*Dv*Np/Vb/fb/fb - k*Dv)),
 ])
 
 k_values = OrderedDict([
