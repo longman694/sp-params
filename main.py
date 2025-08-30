@@ -52,11 +52,12 @@ l_over_a = np.inf
 Res = Bl**2/Rms
 Les = Bl**2*Cms
 Ces = Mms/Bl**2
+
 Leb = Bl**2 / Sd**2 * Vb/ (rho*c**2)
 Cev = Sd**2/Bl**2 * rho * l_over_a
 
 # qes = omegas*res*ces
-feq = np.logspace(np.log10(20), np.log10(20_000), 1_000)
+feq = np.logspace(1, np.log10(20_000), 1_000)
 omega = 2 * np.pi * feq
 
 n=1
@@ -90,6 +91,14 @@ n0 = Sd**2 * rho/c/2/np.pi/Re/Ces**2/Bl**2
 st.latex(r'\eta = \frac{Sd^2}{2\pi\rho c \cdot R_e \cdot Ces^2 \cdot (Bl)^2} = ' + f'{n0 * 100: 0.4} \%')
 
 
+st.write("---")
+
+st.latex(r'R_{es} = \frac{(Bl)^2}{R_{ms}} =' + f'{Res:.3}' + r'\;\Omega')
+st.latex(r'L_{es} = \frac{(Bl)^2}{C_{ms}} =' + f'{Les*1000:.3}' + r'\;mH')
+st.latex(r'C_{es} = \frac{M_{ms}}{(Bl)^2} =' + f'{Ces*1000000}' + r'\;uF')
+
+
+
 imp_chart = make_subplots(specs=[[{"secondary_y": True}]])
 imp_chart.add_trace(
     go.Scatter(x=df['feq'], y=df['impedance'], name="Impedance"),
@@ -101,11 +110,11 @@ imp_chart.add_trace(
     secondary_y=True,
 )
 
-imp_chart.update_xaxes(title_text="Frequency", type="log", range=[1.3, 4.3])
-magnitude_chart = px.line(df, x='feq', y='spl', log_x=True)
-group_delay_chart = px.line(df, x='feq', y='gd', log_x=True)
+imp_chart.update_xaxes(title_text="Frequency", type="log", range=[1, 4])
+magnitude_chart = px.line(df, x='feq', y='spl', log_x=True, range_x=[10, 10000])
+group_delay_chart = px.line(df, x='feq', y='gd', log_x=True, range_x=[10, 10000])
 
-tab1, tab2, tab3 = st.tabs(["Impedance", "Magnitude", "Group Delay"])
+tab1, tab2, tab3 = st.tabs(["Impedance", "Magnitude", "Group Delay (ms)"])
 with tab1:
     st.plotly_chart(imp_chart, use_container_width=True)
 with tab2:

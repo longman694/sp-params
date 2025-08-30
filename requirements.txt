@@ -4,5 +4,6 @@ unit-converter
 numpy
 jupyter
 plotly
+sympy_plot_backends[plotly]
 pandas
 streamlit

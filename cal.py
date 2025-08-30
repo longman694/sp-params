@@ -1,3 +1,5 @@
+from typing import Literal
+
 import numpy as np
 
 from termcolor import colored
@@ -9,7 +11,9 @@ from sympy.printing import pprint
 
 init_printing()
 
+A, V, L = symbols('A V L')
 f3, fb, fc, fs, Vas, Vb, Qtc, Qts, Qes, Qms = symbols('f3 fb fc fs Vas Vb Qtc Qts Qes Qms')
+k, Dv, Np, Lv = symbols('k Dv Np Lv')
 
 THDN = symbols('THDN')
 SOUND_SPEED = 343
@@ -40,6 +44,20 @@ sealed_box_eqs = [
     Eq(f3, fb / 2**0.5 * sqrt((1/Qtc**2 - 2) + sqrt((1/Qtc**2-2)**2 + 4))),
 ]
 
+ported_box_eqs = OrderedDict([
+    ('Fb (Dv)', Eq(fb, c/2/pi * sqrt( pi*Dv*Dv/4*Np / Vb / (Lv + k*Dv) )))
+    ('Fb (A)', Eq(fb, c/2/pi * sqrt(A*Np / Vb / (Lv + k*(sqrt(4/pi*A))) )))
+    ('Lv (Dv)', Eq(10*c*c/16/pi * Dv*Dv*Np/Vb/fb/fb - k*Dv))
+])
+
+k_values = OrderedDict([
+    ('free-free', 0.614),
+    ('free-flanged', 0.732),
+    ('flanged-flanged', 0.850),
+    ('bottom slot port', 2.227),
+])
+
+helmholtz_resonator_eq = Eq(fb, SOUND_SPEED/2/pi * sqrt(A/V/L))
 
 def print_eqs(eqs):
     if isinstance(eqs, OrderedDict):
@@ -148,3 +166,37 @@ def cal_spl_sd_xmax(xmax, sd, freq):
     sd = sd * 0.0001
     vd = sd * xmax
     return 112 + 10 * log(4 * pi**3 * AIR_DENSITY / SOUND_SPEED * vd**2 * freq**4, 10).evalf()
+
+
+class Crossover:
+    """uncompleted"""
+    f0, C1, C2, L1, L2 = symbols('f0 C1 C2 L1 L2')
+
+    # low pass filter
+    L_EQ = [
+        Eq(f0, 1 / pi / R / L1),
+        Eq(f0, 1 / pi / sqrt(C1 * L1)),
+        Eq(f0, 1 / pi / pow(C1 * L1 * L2, 0.333333)),
+        Eq(f0, 1 / pi / pow(C1 * C2 * L1 * L2, 0.25)),
+    ]
+    # high pass filter
+    H_EQ = [
+        Eq(f0, 1 / pi / R / C1),
+        Eq(f0, 1 / pi / sqrt(C1 * L1)),
+        Eq(f0, 1 / pi / pow(C1 * C2 * L1, 0.333333)),
+        Eq(f0, 1 / pi / pow(C1 * C2 * L1 * L2, 0.25)),
+    ]
+
+    def __init__(self, side: Literal['high', 'low'], impedance, order=2, q=0.707):
+        self.R = impedance
+        self.Q = q
+        if side.lower() == 'high':
+            self.eq = self.H_EQ[order - 1]
+        elif side.lower() == 'low':
+            self.eq = self.L_EQ[order - 1]
+        else:
+            raise ValueError(f'side must be either "high" or "low"')
+
+    def cal_L_C(self, freq):
+        return
+
