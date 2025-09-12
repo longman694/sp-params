@@ -45,9 +45,9 @@ sealed_box_eqs = [
 ]
 
 ported_box_eqs = OrderedDict([
-    ('Fb (Dv)', Eq(fb, c/2/pi * sqrt( pi*Dv*Dv/4*Np / Vb / (Lv + k*Dv) ))),
-    ('Fb (A)', Eq(fb, c/2/pi * sqrt(A*Np / Vb / (Lv + k*(sqrt(4/pi*A))) ))),
-    ('Lv (Dv)', Eq(Lv, 10*c*c/16/pi * Dv*Dv*Np/Vb/fb/fb - k*Dv)),
+    ('Fb (Dv)', Eq(fb, SOUND_SPEED/2/pi * sqrt( pi*Dv*Dv/4*Np / Vb / (Lv + k*Dv) ))),
+    ('Fb (A)', Eq(fb, SOUND_SPEED/2/pi * sqrt(A*Np / Vb / (Lv + k*(sqrt(4/pi*A))) ))),
+    ('Lv (Dv)', Eq(Lv, 10*SOUND_SPEED*SOUND_SPEED/16/pi * Dv*Dv*Np/Vb/fb/fb - k*Dv)),
 ])
 
 k_values = OrderedDict([
@@ -166,6 +166,35 @@ def cal_spl_sd_xmax(xmax, sd, freq):
     sd = sd * 0.0001
     vd = sd * xmax
     return 112 + 10 * log(4 * pi**3 * AIR_DENSITY / SOUND_SPEED * vd**2 * freq**4, 10).evalf()
+
+
+def start_cal_qts(z_max, re):
+    """
+    Start calurate Qts of a speaker driver from impedance graph.
+    This function will return Z_0, then you need to find F_left and F_right
+    for cal_qts function.
+    """
+    z_0 = sqrt(z_max*re)
+    print(f"Z_0 = {z_0}\n")
+    print("Please prepare F_left, F_peak, and F_right.")
+    print("Then, call cal_qts(F_left, F_peak, F_right, z_max, re)\n")
+    return z_0
+
+
+def cal_qts(F_left, F_peak, F_right, z_max, re):
+    assert F_left < F_peak < F_right, 'invalid F values'
+    assert z_max > re > 0, 'invalid z_max and re value'
+
+    f_ratio = F_peak / (F_right - F_left)
+    qms = f_ratio * sqrt(z_max / re)
+    qes = qms / (z_max/re - 1)
+    qts = qes*qms / (qes+qms)
+    print()
+    print(f"Qms = {qms}")
+    print(f"Qes = {qes}")
+    print(f"Qts = {qts}")
+    print()
+    return qts
 
 
 class Crossover:
